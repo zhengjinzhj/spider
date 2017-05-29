@@ -19,8 +19,9 @@ def get_page_url():
     # 222-Xiuren, 223-MyGirl, 224-Tukmo(Bololi), 225-MiStar, 226-IMiss
     # 227-MFStar, 228-FEILIN, 229-UXing, 230-YouWu, 231-MiiTao, 232-TASTE
     # 15-Ugirls, 18-Rosi, 13-Disi, 39-Ligui, 209-TouTiao, 239-QingDouKe
-    main_url = 'http://www.ftoow.com/thread.php?fid-225-page-'
-    for i in (1, 2):
+    main_url = 'http://www.ftoow.com/thread.php?fid-228-page-'
+
+    for i in range(1, 4):  # 3 means get 2 pages
         index_page_url = main_url + str(i) + '.html'
         chrome.get(index_page_url)
         soup = BeautifulSoup(chrome.page_source, 'html.parser')
@@ -33,7 +34,7 @@ def get_page_url():
             link = 'http://www.ftoow.com/' + item['href'].strip()
             name = item.string.strip()
             # find the albums before particular one (may downloaded already last time)
-            if 'VOL.142' in name:  # check the end point manually and BE CAREFUL with the caps
+            if 'No.034' in name:  # check the end point manually and BE CAREFUL with the caps
                 break
             url_title_dict.setdefault(link, name)
     return url_title_dict
@@ -51,26 +52,28 @@ def save_albums(url, name):
             password = get_password[0].text.strip()
         else:
             pw_soup = BeautifulSoup(chrome.page_source, 'html.parser')
-            password = pw_soup.find('a', class_='down').nextSibling[-5:]
+            password = pw_soup.find('a', class_='down').nextSibling.strip()[-4:]
+        if len(password) == 4:
+            # target="_blank" means open the link in a new tab, remove it to let the link open within the tab
+            js = 'document.getElementsByClassName("down")[0].target="";'
+            chrome.execute_script(js)
 
-        # target="_blank" means open the link in a new tab, remove it to let the link open within the tab
-        js = 'document.getElementsByClassName("down")[0].target="";'
-        chrome.execute_script(js)
-
-        chrome.find_element_by_class_name('down').click()
-        chrome.find_element_by_xpath('//*[@id="accessCode"]').send_keys(password)
-        chrome.find_element_by_xpath('//*[@id="submitBtn"]/a').click()
-        # 隐形等待是设置了一个最长等待时间，如果在规定时间内网页加载完成，则执行下一步，否则一直等到时间截止，然后执行下一步。
-        # 隐性等待对整个driver的周期都起作用，所以只要设置一次即可。
-        # chrome.implicitly_wait(5)
-        time.sleep(3)
-        chrome.find_element_by_class_name('g-button-right').click()
-        # locator = (By.CLASS_NAME, 'g-button-right')
-        # WebDriverWait(chrome, 3).until(ec.presence_of_element_located(locator))
-        time.sleep(3)
-        chrome.find_element_by_xpath('//*[@id="fileTreeDialog"]/div[4]/a[2]/span').click()
-        time.sleep(2)
-        print name + ' is saved.'
+            chrome.find_element_by_class_name('down').click()
+            chrome.find_element_by_xpath('//*[@id="accessCode"]').send_keys(password)
+            chrome.find_element_by_xpath('//*[@id="submitBtn"]/a').click()
+            # 隐形等待是设置了一个最长等待时间，如果在规定时间内网页加载完成，则执行下一步，否则一直等到时间截止，然后执行下一步。
+            # 隐性等待对整个driver的周期都起作用，所以只要设置一次即可。
+            # chrome.implicitly_wait(5)
+            time.sleep(3)
+            chrome.find_element_by_class_name('g-button-right').click()
+            # locator = (By.CLASS_NAME, 'g-button-right')
+            # WebDriverWait(chrome, 3).until(ec.presence_of_element_located(locator))
+            time.sleep(3)
+            chrome.find_element_by_xpath('//*[@id="fileTreeDialog"]/div[4]/a[2]/span').click()
+            time.sleep(2)
+            print name + ' is saved.'
+        else:
+            print(name + ': get password failed, please check it by yourself.')
     else:
         print name + ' is not free!!!'
 
@@ -78,6 +81,7 @@ def save_albums(url, name):
 for k, v in get_page_url().items():
     save_albums(k, v)
     # print k, v
+
 chrome.quit()
 
 
