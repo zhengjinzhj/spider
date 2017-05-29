@@ -16,7 +16,7 @@ chrome = webdriver.Chrome(chrome_options=chrome_options)
 
 def get_page_url():
     url_title_dict = {}
-    # 226-IMiss, 225-MiStar
+    # 226-IMiss, 225-MiStar, 223-MyGirl, 227-MFStar, 228-FEILIN
     main_url = 'http://www.ftoow.com/thread.php?fid-225-page-'
     for i in (1, 2):
         index_page_url = main_url + str(i) + '.html'
