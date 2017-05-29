@@ -16,7 +16,9 @@ chrome = webdriver.Chrome(chrome_options=chrome_options)
 
 def get_page_url():
     url_title_dict = {}
-    # 226-IMiss, 225-MiStar, 223-MyGirl, 227-MFStar, 228-FEILIN
+    # 222-Xiuren, 223-MyGirl, 224-Tukmo(Bololi), 225-MiStar, 226-IMiss
+    # 227-MFStar, 228-FEILIN, 229-UXing, 230-YouWu, 231-MiiTao, 232-TASTE
+    # 15-Ugirls, 18-Rosi, 13-Disi, 39-Ligui, 209-TouTiao, 239-QingDouKe
     main_url = 'http://www.ftoow.com/thread.php?fid-225-page-'
     for i in (1, 2):
         index_page_url = main_url + str(i) + '.html'
@@ -31,13 +33,13 @@ def get_page_url():
             link = 'http://www.ftoow.com/' + item['href'].strip()
             name = item.string.strip()
             # find the albums before particular one (may downloaded already last time)
-            if 'Vol.158' in name:
+            if 'VOL.142' in name:  # check the end point manually and BE CAREFUL with the caps
                 break
             url_title_dict.setdefault(link, name)
     return url_title_dict
 
 
-def from_page_link(url, name):
+def save_albums(url, name):
     # url is the album page url, something like this: http://www.ftoow.com/read.php?tid-32350.html
     chrome.get(url)
 
@@ -74,8 +76,8 @@ def from_page_link(url, name):
 
 
 for k, v in get_page_url().items():
-    # from_page_link(k, v)
-    print k, v
+    save_albums(k, v)
+    # print k, v
 chrome.quit()
 
 
