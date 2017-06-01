@@ -20,9 +20,9 @@ def get_page_url():
     # 227-MFStar, 228-FEILIN, 229-UXing, 230-YouWu, 231-MiiTao, 232-TASTE
     # 15-Ugirls, 18-Rosi, 13-Disi, 39-Ligui, 209-TouTiao, 239-QingDouKe
 
-    # main_url = 'http://www.ftoow.com/thread.php?fid-245-page-'
-    main_url = 'http://www.itokoo.com/thread-htm-fid-136-page-'
-    for i in range(1, 3):  # 3 means get 2 pages
+    main_url = 'http://www.ftoow.com/thread.php?fid-15-page-'
+    # main_url = 'http://www.itokoo.com/thread-htm-fid-15-page-'
+    for i in range(1, 4):  # 3 means get 2 pages
         index_page_url = main_url + str(i) + '.html'
         chrome.get(index_page_url)
         soup = BeautifulSoup(chrome.page_source, 'html.parser')
@@ -32,10 +32,10 @@ def get_page_url():
             contents = soup.find('table', class_='z').find_all('tr')  # children(trs under table)
         for content in contents:  # a content is a tr
             item = content.find('a', class_='subject_t')  # a tag(that has class key) under tr tag
-            link = 'http://www.itokoo.com/' + item['href'].strip()  # ftoow
+            link = 'http://www.ftoow.com/' + item['href'].strip()  # ftoow, itokoo
             name = item.string.strip()
             # find the albums before particular one (may downloaded already last time)
-            if 'VOL.004' in name:  # check the end point manually and BE CAREFUL with the caps
+            if 'U239' in name:  # check the end point manually and BE CAREFUL with the caps
                 break
             url_title_dict.setdefault(link, name)
     return url_title_dict
@@ -53,14 +53,14 @@ def save_albums(url, name):
             password = get_password[0].text.strip()
         else:
             pw_soup = BeautifulSoup(chrome.page_source, 'html.parser')
-            # password = pw_soup.find('a', class_='down').nextSibling.strip()[-4:]
-            password = pw_soup.find_all('a', class_='down')[1].nextSibling.strip()[-4:]  # for itokoo.com
+            password = pw_soup.find('a', class_='down').nextSibling.strip()[-4:]
+            # password = pw_soup.find_all('a', class_='down')[1].nextSibling.strip()[-4:]  # for itokoo.com
         if len(password) == 4:
             # target="_blank" means open the link in a new tab, remove it to let the link open within the tab
             js = 'document.getElementsByClassName("down")[0].target="";'
             chrome.execute_script(js)
 
-            chrome.find_elements_by_class_name('down')[1].click()
+            chrome.find_elements_by_class_name('down')[0].click()
             time.sleep(2)
             chrome.find_element_by_xpath('//*[@id="accessCode"]').send_keys(password)
             chrome.find_element_by_xpath('//*[@id="submitBtn"]/a').click()
@@ -71,7 +71,7 @@ def save_albums(url, name):
             chrome.find_element_by_class_name('g-button-right').click()
             # locator = (By.CLASS_NAME, 'g-button-right')
             # WebDriverWait(chrome, 3).until(ec.presence_of_element_located(locator))
-            time.sleep(4)
+            time.sleep(4)  # //*[@id="fileTreeDialog"]/div[4]/a[2]
             chrome.find_element_by_xpath('//*[@id="fileTreeDialog"]/div[4]/a[2]/span').click()
             time.sleep(2)
             print name + ' is saved.'
