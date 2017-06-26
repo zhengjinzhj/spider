@@ -4,13 +4,13 @@ from selenium import webdriver
 import time
 # from selenium.webdriver.support.wait import WebDriverWait
 # from selenium.webdriver.support import expected_conditions as ec
-# from selenium.webdriver.common.by import By
+from selenium.webdriver.common.by import By
 # from selenium.common.exceptions import NoSuchElementException
 from bs4 import BeautifulSoup
 
 
 chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument('user-data-dir=C:\Users\zheng\AppData\Local\Google\Chrome\User Data')
+chrome_options.add_argument('user-data-dir=C:\\Users\\zheng\\AppData\\Local\\Google\\Chrome\\User Data')
 chrome = webdriver.Chrome(chrome_options=chrome_options)
 
 
@@ -78,14 +78,14 @@ def save_albums(url, name):
             js = 'document.getElementsByClassName("down")[0].target="";'
             chrome.execute_script(js)
             save_file(password)
-            print name + ' is saved.'
+            print(name + ' is saved.')
         else:
             print(name + ': get password failed, please check it by yourself.')
     else:
-        print name + ' is not free!!!'
+        print(name + ' is not free!!!')
 
 all_album = get_page_url()
-print len(all_album)
+print(len(all_album))
 for k, v in all_album.items():
     save_albums(k, v)
 #     print k, v

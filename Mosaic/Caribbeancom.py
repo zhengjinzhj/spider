@@ -29,23 +29,25 @@ class Caribbeancom(object):
         # response = self.opener.open(page_url)
         # response = response.read().decode('euc-jp').encode('utf-8')
         data = requests.get(page_url, proxies=self.proxy)
-        content = data.text.encode('utf-8')
-        response = self.remove_quota(content)
-        pattern = re.compile('<div itemscope itemtype=.*?VideoObject>.*?<a href=\/moviepages\/(.*?)\/index.html.*?'
-                             '<img.*?thumbnail src=(.*?) alt=(.*?) title=(.*?)>.*?movie-date>(.*?)</span>', re.S)
-        items = re.findall(pattern, response)
+        content = data.text
+        # print(content, type(content))
+        # response = self.remove_quota(content)
+        pattern = re.compile('<div itemscope itemtype=.*?VideoObject">.*?<a href="\/moviepages\/(.*?)\/index.html".*?'
+                             '<img.*?thumbnail" src="(.*?)" alt="(.*?)" title="(.*?)">.*?movie-date">(.*?)</span>', re.S)
+        items = re.findall(pattern, content)
         for item in items:
             thumbnail = item[1].replace('256x144', '')
             actress = item[2].replace(item[3], '')
             # item[2]=title + actress, item[3]=title
             one_page_data.append([item[0], thumbnail, actress.strip(), item[3].strip(), item[4]])
+            # print([item[0], thumbnail, actress.strip(), item[3].strip(), item[4]])
         return one_page_data
 
     def save_picture(self, image_url, movie_id):
         picture_name = movie_id + '.jpg'
         picture_address = 'Caribbeancom' + '/' + picture_name
         if not os.path.isfile(picture_address):
-            print 'Downloading ' + picture_name
+            print('Downloading ' + picture_name)
             # response = self.opener.open(image_url)
             # data = response.read()
             response = requests.get(image_url, proxies=self.proxy)
@@ -54,38 +56,32 @@ class Caribbeancom(object):
             f.write(data)
             f.close()
         else:
-            print picture_name + ' already exists, skip...'
+            print(picture_name + ' already exists, skip...')
 
     @staticmethod
     def make_folder(folder_name):
         if not os.path.exists(folder_name):
-            print 'Creating folder: ' + folder_name
+            print('Creating folder: ' + folder_name)
             os.makedirs(folder_name)
         else:
-            print 'Folder "' + folder_name + '" already exists, skip...'
-
-    @staticmethod
-    def remove_quota(content):
-        pattern = re.compile('\"')
-        content = re.sub(pattern, '', content)
-        return content
+            print('Folder "' + folder_name + '" already exists, skip...')
 
     def write_csv(self):
-        csv_file = file('carib_newest.csv', 'wb')
-        writer = csv.writer(csv_file, dialect='excel')
-        writer.writerow(['Movie ID', 'Release Date', 'Title', 'Actress', 'Thumbnail'])
-        total_page = 2  # 2017-03-20
-        # total_page = self.get_total_page()
-        self.make_folder('Caribbeancom')
-        for page in xrange(1, total_page+1):
-            print '*'*20 + 'Crawling page ' + str(page) + '*'*20
-            data = self.get_content(page)
-            for movie in data:
-                writer.writerow([movie[0], movie[4], movie[3], movie[2], movie[1]])
+        with open('carib_newest.csv', 'w', encoding='utf-8', newline='') as csv_file:
+            writer = csv.writer(csv_file, dialect='excel')
+            writer.writerow(['Movie ID', 'Release Date', 'Title', 'Actress', 'Thumbnail'])
+            total_page = 3  # 2017-06-26
+            # total_page = self.get_total_page()
+            self.make_folder('Caribbeancom')
+            for page in range(1, total_page+1):
+                print('*'*20 + 'Crawling page ' + str(page) + '*'*20)
+                data = self.get_content(page)
+                for movie in data:
+                    writer.writerow([movie[0], movie[4], movie[3], movie[2], movie[1]])
         csv_file.close()
 
     def save_thumbnails(self):
-        with open('caribbeancom_temp.csv', 'rb') as csv_file:
+        with open('carib_newest.csv', 'r', encoding='utf-8') as csv_file:
             reader = csv.DictReader(csv_file)
             data = [row for row in reader]
             picture_link = [row['Thumbnail'] for row in data]
@@ -96,8 +92,8 @@ class Caribbeancom(object):
                 self.save_picture(link, name)
 
 demo = Caribbeancom()
-demo.write_csv()
-# demo.save_thumbnails()
+# demo.write_csv()
+demo.save_thumbnails()
 
 
 
