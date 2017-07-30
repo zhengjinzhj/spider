@@ -48,8 +48,6 @@ class Caribbeancom(object):
         picture_address = 'Caribbeancom' + '/' + picture_name
         if not os.path.isfile(picture_address):
             print('Downloading ' + picture_name)
-            # response = self.opener.open(image_url)
-            # data = response.read()
             response = requests.get(image_url, proxies=self.proxy)
             data = response.content
             f = open(picture_address, 'wb')
@@ -81,19 +79,19 @@ class Caribbeancom(object):
         csv_file.close()
 
     def save_thumbnails(self):
-        with open('carib_newest.csv', 'r', encoding='utf-8') as csv_file:
+        with open('test.csv', 'r', encoding='utf-8') as csv_file:
             reader = csv.DictReader(csv_file)
             data = [row for row in reader]
-            picture_link = [row['Thumbnail'] for row in data]
+            picture_link = [row['Cover'] for row in data]
             picture_id = [row['Movie ID'] for row in data]
             link_id = dict(zip(picture_link, picture_id))
             for (link, name) in link_id.items():
-                link = link.replace('https', 'http')
+                # link = link.replace('https', 'http')
                 self.save_picture(link, name)
 
 demo = Caribbeancom()
-# demo.write_csv()
-demo.save_thumbnails()
+demo.write_csv()
+# demo.save_thumbnails()
 
 
 

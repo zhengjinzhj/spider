@@ -22,7 +22,8 @@ def get_page_url():
 
     main_url = 'http://www.ftoow.com/thread.php?fid-222-page-'
     # main_url = 'http://www.itokoo.com/thread-htm-fid-15-page-'
-    for i in range(1, 3):  # 3 means get 2 pages
+    # temp = 'http://www.ftoow.com/thread.php?fid-61-type-82-page-'
+    for i in range(8, 10):  # 3 means get 2 pages
         index_page_url = main_url + str(i) + '.html'
         chrome.get(index_page_url)
         soup = BeautifulSoup(chrome.page_source, 'html.parser')
@@ -35,7 +36,7 @@ def get_page_url():
             link = 'http://www.ftoow.com/' + item['href'].strip()  # ftoow, itokoo
             name = item.string.strip()
             # find the albums before particular one (may downloaded already last time)
-            if 'VOL.031' in name:  # check the end point manually and BE CAREFUL with the caps
+            if 'No.749' in name:  # check the end point manually and BE CAREFUL with the caps
                 break
             url_title_dict.setdefault(link, name)
     return url_title_dict
@@ -55,7 +56,8 @@ def save_file(password):
     # locator = (By.CLASS_NAME, 'g-button-right')
     # WebDriverWait(chrome, 3).until(ec.presence_of_element_located(locator))
     time.sleep(4)  # //*[@id="fileTreeDialog"]/div[4]/a[2]
-    chrome.find_element_by_xpath('//*[@id="fileTreeDialog"]/div[4]/a[2]/span').click()
+    # chrome.find_element_by_xpath('//*[@id="fileTreeDialog"]/div[4]/a[2]/span').click()
+    chrome.find_elements_by_class_name('g-button-right')[-2].click()
     time.sleep(2)
 
 
@@ -84,10 +86,21 @@ def save_albums(url, name):
     else:
         print(name + ' is not free!!!')
 
+
+def modify_dict(url, name):
+    chrome.get(url)
+    download_button = chrome.find_elements_by_class_name('down')
+    if len(download_button) != 0:
+        print('%s: %s' % (name, url))
+    else:
+        pass
+
+
 all_album = get_page_url()
 print(len(all_album))
 for k, v in all_album.items():
     save_albums(k, v)
+    # modify_dict(k, v)
 #     print k, v
 
 

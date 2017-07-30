@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import threading
-from Queue import Queue
+from queue import Queue
 from info_collector import AV9898
 
 queue = Queue()
